@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Depoimentos Automáticos</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <style>
+    /* Estilo geral */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .carousel-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .carousel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+      position: relative;
+    }
+
+    .carousel .slide {
+      width: 80%;
+      min-height: 230px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 18px;
+      color: #333;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .carousel .user-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+    }
+
+    .carousel .stars {
+      color: #FFD700;
+      margin: 10px 0;
+    }
+
+    .carousel .user-name {
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .carousel .navigation {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      color: #333;
+      cursor: pointer;
+    }
+
+    .carousel .prev {
+      left: 10px;
+    }
+
+    .carousel .next {
+      right: 10px;
+    }
+
+    /* Estilo do aviso de localização */
+    .location-info {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #555;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="carousel-container">
+    <div class="carousel">
+      <!-- Botão anterior -->
+      <i class="fas fa-chevron-left navigation prev" onclick="previousSlide()"></i>
+
+      <!-- Área do slide -->
+      <div class="slide">
+        <img src="" alt="Usuário" class="user-image">
+        <div class="testimony-text"></div>
+        <div class="stars">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star-half-alt"></i>
+        </div>
+        <div class="user-name"></div>
+      </div>
+
+      <!-- Botão próximo -->
+      <i class="fas fa-chevron-right navigation next" onclick="nextSlide()"></i>
+    </div>
+
+    <div class="location-info">
+      <span id="address"></span>
+    </div>
+  </div>
+
+  <script>
+    // Depoimentos automáticos
+    const testimonies = [
+      "Estou usando as atividades que comprei do super combo e meus alunos estão adorando!",
+      "Já estou analisando as atividades, achei ótimas! Muito bem estruturadas e de fácil aplicação!",
+      "Estou encantada! Esse material vou aproveitar com meu filho e também com meus alunos!",
+      "Vim agradecer pelas adoráveis atividades, estou amando! Muito obrigada!",
+      "Conteúdo perfeito! Amei! Vocês estão de parabéns! Obrigada por contribuírem!",
+      "Esse atendimento personalizado de vocês é incrível! Parabéns!",
+      "Que material maravilhoso! Parabéns! Tudo de acordo com o que estava procurando!",
+      "Gostei muito do presente! Irei indicar para minhas colegas de profissão!"
+    ];
+
+    // Cidades e estados aleatórios do Brasil
+    const randomLocations = [
+      "São Paulo, SP",
+      "Rio de Janeiro, RJ",
+      "Belo Horizonte, MG",
+      "Curitiba, PR",
+      "Salvador, BA",
+      "Fortaleza, CE",
+      "Porto Alegre, RS",
+      "Manaus, AM"
+    ];
+
+    // Elementos do slide
+    const slide = document.querySelector('.slide');
+    const testimonyText = document.querySelector('.testimony-text');
+    const userImage = document.querySelector('.user-image');
+    const userName = document.querySelector('.user-name');
+
+    let slideIndex = 0;
+
+    /**
+     * Gera nomes e fotos aleatórios
+     */
+    const generateRandomUser = async () => {
+      const response = await fetch('https://randomuser.me/api/?nat=br&gender=female');
+      const data = await response.json();
+      const user = data.results[0];
+
+      return {
+        name: `${user.name.first} ${user.name.last}`,
+        image: user.picture.large
+      };
+    };
+
+    /**
+     * Atualiza o slide com o depoimento e dados do usuário
+     */
+    const updateSlide = async () => {
+      const user = await generateRandomUser();
+      testimonyText.textContent = testimonies[slideIndex];
+      userImage.src = user.image;
+      userName.textContent = user.name;
+    };
+
+    /**
+     * Vai para o depoimento anterior
+     */
+    const previousSlide = () => {
+      slideIndex = (slideIndex - 1 + testimonies.length) % testimonies.length;
+      updateSlide();
+    };
+
+    /**
+     * Vai para o próximo depoimento
+     */
+    const nextSlide = () => {
+      slideIndex = (slideIndex + 1) % testimonies.length;
+      updateSlide();
+    };
+
+    // Exibe o primeiro slide
+    updateSlide();
+
+    /**
+     * Localização do usuário
+     */
+    $.get("https://ipinfo.io/json", function (response) {
+      $("#address").html(response.city + ", em " + response.region);
+    }, "jsonp").fail(() => {
+      // Caso a localização falhe, selecione uma localização aleatória
+      const randomLocation = randomLocations[Math.floor(Math.random() * randomLocations.length)];
+      $("#address").html(randomLocation);
+    });
+  </script>
+</body>
+</html>
